@@ -1,8 +1,5 @@
 ﻿using BrainConciergerie.Models;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
-using System.Collections.Generic;
-using System.Reflection.Emit;
 
 namespace BrainConciergerie.Data
 {
@@ -13,20 +10,28 @@ namespace BrainConciergerie.Data
         {
         }
 
-        public DbSet<Appart> Appartements { get; set; }
+        public DbSet<Appart> Apparts { get; set; }
         public DbSet<Bars> Bars { get; set; }
         public DbSet<Equipements> Equipements { get; set; }
         public DbSet<Restaurants> Restaurants { get; set; }
-        public DbSet<Cinema> Cinema { get; set; }
+        public DbSet<Cinemas> Cinemas { get; set; }
         public DbSet<Photos> Photos { get; set; }
         public DbSet<AutresActivites> AutresActivites { get; set; }
         public DbSet<Monuments> Monuments { get; set; }
+        public DbSet<NotationsAppart> NotationsAppart { get; set; }
+
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
-            // Ajoutez ici des configurations supplémentaires pour vos entités si nécessaire.
+            // Configuration de la relation many-to-many entre Appart et Equipements
         }
+
+
+
+        public DbSet<BrainConciergerie.Models.NotationAppartDTO> NotationAppartDTO { get; set; } = default!;
+
     }
 }

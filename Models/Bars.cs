@@ -1,12 +1,16 @@
-﻿using System;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
+
 namespace BrainConciergerie.Models
 {
-	public class Bars
-	{
-		public Bars()
-		{
-		}
+    public class Bars
+    {
+        public Bars()
+        {
+        }
 
+        [Key]
         public int Id { get; set; }
 
         public string? Nom { get; set; }
@@ -15,9 +19,10 @@ namespace BrainConciergerie.Models
 
         public string? Description { get; set; }
 
-        public int? AppartsId { get; set; }
+        public int? AppartId { get; set; }
 
-        public Appart? Appartement { get; set; }
+        [JsonIgnore]
+        public Appart? Appart { get; set; }
     }
 }
 

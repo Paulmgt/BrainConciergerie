@@ -1,16 +1,18 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using BrainConciergerie.Data;
 using BrainConciergerie.Models;
 
-namespace AppartsAppReactCs.Controllers
+namespace BrainConciergerie.Controllers
 {
-    public class EquipementsController : Controller
+    [Route("api/[controller]")]
+    [ApiController]
+    public class EquipementsController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
 
@@ -19,145 +21,183 @@ namespace AppartsAppReactCs.Controllers
             _context = context;
         }
 
-        // GET: Equipements
-        public async Task<IActionResult> Index()
-        {
-              return _context.Equipements != null ? 
-                          View(await _context.Equipements.ToListAsync()) :
-                          Problem("Entity set 'ApplicationDbContext.Equipements'  is null.");
-        }
-
-        // GET: Equipements/Details/5
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null || _context.Equipements == null)
-            {
-                return NotFound();
-            }
-
-            var equipements = await _context.Equipements
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (equipements == null)
-            {
-                return NotFound();
-            }
-
-            return View(equipements);
-        }
-
-        // GET: Equipements/Create
-        public IActionResult Create()
-        {
-            return View();
-        }
-
-        // POST: Equipements/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Nom,Quantite,Description,AppartsId")] Equipements equipements)
-        {
-            if (ModelState.IsValid)
-            {
-                _context.Add(equipements);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            return View(equipements);
-        }
-
-        // GET: Equipements/Edit/5
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null || _context.Equipements == null)
-            {
-                return NotFound();
-            }
-
-            var equipements = await _context.Equipements.FindAsync(id);
-            if (equipements == null)
-            {
-                return NotFound();
-            }
-            return View(equipements);
-        }
-
-        // POST: Equipements/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Nom,Quantite,Description,AppartsId")] Equipements equipements)
-        {
-            if (id != equipements.Id)
-            {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(equipements);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!EquipementsExists(equipements.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            return View(equipements);
-        }
-
-        // GET: Equipements/Delete/5
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null || _context.Equipements == null)
-            {
-                return NotFound();
-            }
-
-            var equipements = await _context.Equipements
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (equipements == null)
-            {
-                return NotFound();
-            }
-
-            return View(equipements);
-        }
-
-        // POST: Equipements/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        // GET: api/Equipements
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<EquipementDTO>>> GetEquipements()
         {
             if (_context.Equipements == null)
             {
-                return Problem("Entity set 'ApplicationDbContext.Equipements'  is null.");
+                return NotFound();
+            }
+
+            var equipements = await _context.Equipements.Include(e => e.Appart).ToListAsync();
+
+            var equipementDtos = equipements.Select(equipement => new EquipementDTO
+            {
+                Id = equipement.Id,
+                // assigner d'autres propriétés de l'équipement...
+
+                AppartementId = equipement.Appart.Id,
+                // assigner d'autres propriétés de l'appartement...
+            }).ToList();
+
+            return equipementDtos;
+        }
+
+        // GET: api/Equipements/5
+        // GET: api/Equipements/{id}
+        [HttpGet("{id}")]
+        public async Task<ActionResult<EquipementDTO>> GetEquipement(int id)
+        {
+            if (_context.Equipements == null)
+            {
+                return NotFound();
+            }
+
+            var equipement = await _context.Equipements.FindAsync(id);
+
+            if (equipement == null)
+            {
+                return NotFound();
+            }
+
+            var equipementDTO = new EquipementDTO
+            {
+                Id = equipement.Id,
+                Nom = equipement.Nom,
+                Description = equipement.Description,
+                AppartementId = equipement.AppartId,
+            };
+
+            return equipementDTO;
+        }
+
+
+
+        // PUT: api/Equipements/5
+        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [HttpPut("{id}")]
+        public async Task<IActionResult> PutEquipements(int id, Equipements equipements)
+        {
+            if (id != equipements.Id)
+            {
+                return BadRequest();
+            }
+
+            _context.Entry(equipements).State = EntityState.Modified;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!EquipementsExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return NoContent();
+        }
+
+        // POST: api/Equipements
+        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [HttpPost]
+        public async Task<IActionResult> PostEquipements(Equipements equipements)
+        {
+            if (equipements.AppartId == null)
+            {
+                return BadRequest("AppartId is required.");
+            }
+
+            // Vérifiez si l'appartement correspondant existe.
+            var appart = await _context.Apparts.FindAsync(equipements.AppartId);
+            if (appart == null)
+            {
+                return BadRequest("Appartement does not exist.");
+            }
+
+            _context.Equipements.Add(equipements);
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException)
+            {
+                if (EquipementExists(equipements.Id))
+                {
+                    return Conflict();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return CreatedAtAction("GetEquipements", new { id = equipements.Id }, equipements);
+        }
+
+        private bool EquipementExists(int id)
+        {
+            return _context.Equipements.Any(e => e.Id == id);
+        }
+
+
+        // DELETE: api/Equipements/5
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteEquipements(int id)
+        {
+            if (_context.Equipements == null)
+            {
+                return NotFound();
             }
             var equipements = await _context.Equipements.FindAsync(id);
-            if (equipements != null)
+            if (equipements == null)
             {
-                _context.Equipements.Remove(equipements);
+                return NotFound();
             }
-            
+
+            _context.Equipements.Remove(equipements);
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+
+            return NoContent();
         }
 
         private bool EquipementsExists(int id)
         {
-          return (_context.Equipements?.Any(e => e.Id == id)).GetValueOrDefault();
+            return (_context.Equipements?.Any(e => e.Id == id)).GetValueOrDefault();
         }
+
+
+        [HttpGet("{appartementId}/equipements")]
+        public async Task<ActionResult<IEnumerable<EquipementDTO>>> GetEquipementsByAppartementId(int appartementId)
+        {
+            var equipements = await _context.Equipements
+                .Where(e => e.Appart.Id == appartementId)
+                .Select(e => new EquipementDTO
+                {
+                    Id = e.Id,
+                    Nom = e.Nom,
+                    Quantite = e.Quantite,
+                    Description = e.Description,
+                    AppartementId = e.Appart.Id,
+                })
+                .ToListAsync();
+
+            if (!equipements.Any())
+            {
+                return NotFound();
+            }
+
+            return equipements;
+        }
+
+
+
     }
 }

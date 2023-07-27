@@ -5,20 +5,43 @@ import { BrowserRouter } from 'react-router-dom';
 import App from './App';
 import * as serviceWorkerRegistration from './serviceWorkerRegistration';
 import reportWebVitals from './reportWebVitals';
-import { ChakraProvider } from '@chakra-ui/react';
-import NavMenu from './components/NavMenu';
+import { ChakraProvider, ColorModeScript, extendTheme } from '@chakra-ui/react';
 import { AuthProvider } from './Config/AuthContext';
 
 const baseUrl = document.getElementsByTagName('base')[0].getAttribute('href');
 const rootElement = document.getElementById('root');
 const root = createRoot(rootElement);
 
+const theme = extendTheme({
+    config: {
+        initialColorMode: 'dark',
+        useSystemColorMode: false,
+    },
+    styles: {
+        global: {
+            body: {
+                color: 'black', // text color
+                backgroundColor: '#282c34', // background color
+            },
+        },
+    },
+    colors: {
+        primary: '#daa520', // primary color
+    },
+});
+
 root.render(
-    <BrowserRouter basename={baseUrl}>
-        <ChakraProvider>
-            <App />
-        </ChakraProvider>
-  </BrowserRouter>);
+    <React.StrictMode>
+        <BrowserRouter basename={baseUrl}>
+            <AuthProvider>
+                <ChakraProvider theme={theme}>
+                    <App />
+                </ChakraProvider>
+            </AuthProvider>
+        </BrowserRouter>
+    </React.StrictMode>,
+    document.getElementById('root')
+);
 
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.

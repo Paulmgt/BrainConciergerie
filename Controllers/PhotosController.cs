@@ -1,18 +1,18 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using BrainConciergerie.Data;
 using BrainConciergerie.Models;
-using Microsoft.AspNetCore.Authorization;
 
-namespace AppartsAppReactCs.Controllers
+namespace BrainConciergerie.Controllers
 {
-    [Authorize(Policy = "RequireAdminRole")]
-    public class PhotosController : Controller
+    [Route("api/[controller]")]
+    [ApiController]
+    public class PhotosController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
 
@@ -21,153 +21,132 @@ namespace AppartsAppReactCs.Controllers
             _context = context;
         }
 
-        // GET: Photos
-        public async Task<IActionResult> Index()
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<PhotoDTO>>> GetPhotos()
         {
-              return _context.Photos != null ? 
-                          View(await _context.Photos.ToListAsync()) :
-                          Problem("Entity set 'ApplicationDbContext.Photos'  is null.");
+            var photos = await _context.Photos.Include(p => p.Appart).ToListAsync();
+
+            var photoDtos = photos.Select(photo => new PhotoDTO
+            {
+                Id = photo.Id,
+                // assigner d'autres propriétés de la photo...
+
+                AppartementId = photo.Appart.Id,
+                PhotoFile = photo.PhotoFile,
+                Nom = photo.Nom
+                // assigner d'autres propriétés de l'appartement...
+            }).ToList();
+
+            return photoDtos;
         }
 
-        // GET: Photos/Details/5
-        public async Task<IActionResult> Details(int? id)
+        // GET: api/Photos/5
+        [HttpGet("{id}")]
+        public async Task<ActionResult<PhotoDTO>> GetPhotos(int id)
         {
-            if (id == null || _context.Photos == null)
+            var photo = await _context.Photos.Include(p => p.Appart).SingleOrDefaultAsync(p => p.Id == id);
+            if (photo == null)
             {
                 return NotFound();
             }
 
-            var photos = await _context.Photos
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (photos == null)
+            var photoDto = new PhotoDTO
             {
-                return NotFound();
-            }
+                Id = photo.Id,
+                // assigner d'autres propriétés de la photo...
 
-            return View(photos);
+                AppartementId = photo.Appart.Id,
+                PhotoFile = photo.PhotoFile,
+                Nom = photo.Nom
+                // assigner d'autres propriétés de l'appartement...
+            };
+
+            return photoDto;
         }
 
-        // GET: Photos/Create
-        public IActionResult Create()
-        {
-            return View();
-        }
-
-        // POST: Photos/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Nom,PhotoFile,AppartsId")] Photos photos, IFormFile photoFile)
-        {
-            if (ModelState.IsValid)
-            {
-                if (photoFile != null && photoFile.Length > 0)
-                {
-                    using (var memoryStream = new MemoryStream())
-                    {
-                        await photoFile.CopyToAsync(memoryStream);
-                        photos.PhotoFile = memoryStream.ToArray();
-                    }
-                }
-
-                _context.Photos.Add(photos);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            return View(photos);
-        }
-            // GET: Photos/Edit/5
-            public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null || _context.Photos == null)
-            {
-                return NotFound();
-            }
-
-            var photos = await _context.Photos.FindAsync(id);
-            if (photos == null)
-            {
-                return NotFound();
-            }
-            return View(photos);
-        }
-
-        // POST: Photos/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Nom,PhotoFile,AppartsId")] Photos photos)
+        // PUT: api/Photos/5
+        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [HttpPut("{id}")]
+        public async Task<IActionResult> PutPhotos(int id, Photos photos)
         {
             if (id != photos.Id)
             {
-                return NotFound();
+                return BadRequest();
             }
 
-            if (ModelState.IsValid)
+            _context.Entry(photos).State = EntityState.Modified;
+
+            try
             {
-                try
-                {
-                    _context.Update(photos);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!PhotosExists(photos.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
+                await _context.SaveChangesAsync();
             }
-            return View(photos);
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!PhotosExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return NoContent();
         }
 
-        // GET: Photos/Delete/5
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null || _context.Photos == null)
-            {
-                return NotFound();
-            }
-
-            var photos = await _context.Photos
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (photos == null)
-            {
-                return NotFound();
-            }
-
-            return View(photos);
-        }
-
-        // POST: Photos/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        // POST: api/Photos
+        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [HttpPost]
+        public async Task<ActionResult<Photos>> PostPhotos([FromForm] Photos photos, IFormFile photoFile)
         {
             if (_context.Photos == null)
             {
                 return Problem("Entity set 'ApplicationDbContext.Photos'  is null.");
             }
-            var photos = await _context.Photos.FindAsync(id);
-            if (photos != null)
+
+            // Vous pouvez également effectuer des vérifications supplémentaires sur le fichier ici (taille, type, etc.)
+
+            // Sauvegarder le fichier
+            if (photoFile != null && photoFile.Length > 0)
             {
-                _context.Photos.Remove(photos);
+                using (var memoryStream = new MemoryStream())
+                {
+                    await photoFile.CopyToAsync(memoryStream);
+                    photos.PhotoFile = memoryStream.ToArray();
+                }
             }
-            
+
+            _context.Photos.Add(photos);
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+
+            return CreatedAtAction("GetPhotos", new { id = photos.Id }, photos);
+        }
+
+
+        // DELETE: api/Photos/5
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeletePhotos(int id)
+        {
+            if (_context.Photos == null)
+            {
+                return NotFound();
+            }
+            var photos = await _context.Photos.FindAsync(id);
+            if (photos == null)
+            {
+                return NotFound();
+            }
+
+            _context.Photos.Remove(photos);
+            await _context.SaveChangesAsync();
+
+            return NoContent();
         }
 
         private bool PhotosExists(int id)
         {
-          return (_context.Photos?.Any(e => e.Id == id)).GetValueOrDefault();
+            return (_context.Photos?.Any(e => e.Id == id)).GetValueOrDefault();
         }
     }
 }

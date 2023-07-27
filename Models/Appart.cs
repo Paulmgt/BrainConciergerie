@@ -1,25 +1,25 @@
-﻿using System;
+﻿
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
+
 namespace BrainConciergerie.Models
 {
-	public class Appart
-	{
-		public Appart()
-		{
-		}
+    public class Appart
+    {
 
-		public int Id { get; set; }
+        public Appart()
+        {
+
+        }
+        [Key]
+        public int Id { get; set; }
 
         public string? Nom { get; set; }
 
         public string? Localisation { get; set; }
 
-        public List<Photos>? Photos { get; set; }
-
-        public List<Equipements>? Equipements { get; set; }
-
         public string? Poubelles { get; set; }
-
-        public List<Monuments>? Monuments { get; set; }
 
         public string? Transports { get; set; }
 
@@ -27,14 +27,30 @@ namespace BrainConciergerie.Models
 
         public string? Parking { get; set; }
 
-        public List<Restaurants>? Restaurants { get; set; }
+        [JsonIgnore]
+        public ICollection<Photos>? Photos { get; set; }
 
-        public List<Bars>? Bar { get; set; }
+        [JsonIgnore]
+        public ICollection<Equipements>? Equipements { get; set; }
 
-        public List<Cinema>? Cinema { get; set; }
+        [JsonIgnore]
+        public ICollection<Monuments>? Monuments { get; set; }
 
-        public List<AutresActivites>? AutresActivites { get; set; }
+        [JsonIgnore]
+        public ICollection<Restaurants>? Restaurants { get; set; }
 
+        [JsonIgnore]
+        public ICollection<Bars>? Bars { get; set; }
+
+        [JsonIgnore]
+        public ICollection<Cinemas>? Cinemas { get; set; }
+
+        [JsonIgnore]
+        public ICollection<AutresActivites>? AutresActivites { get; set; }
+
+        [JsonIgnore]
+        public ICollection<NotationsAppart>? NotationsAppart { get; set;}
     }
-}
 
+
+}

@@ -1,80 +1,39 @@
 import React from 'react';
-import { Collapse, Navbar, NavbarBrand, NavbarToggler, NavItem, NavLink } from 'reactstrap';
-import { Link } from 'react-router-dom';
-import './NavMenu.css';
+import { Link, useNavigate } from 'react-router-dom';
+import { Box, Button, Flex, Menu, MenuButton, MenuItem, MenuList, Spacer, Text } from '@chakra-ui/react';
 import { getAuth, signOut } from 'firebase/auth';
-import {
-    Button,
-    useColorMode,
-    Stack,
-    Menu,
-    MenuItem,
-    MenuButton,
-    MenuList,
-} from '@chakra-ui/react';
-import { MoonIcon, SunIcon } from '@chakra-ui/icons';
 
 const NavMenu = () => {
-    const { colorMode, toggleColorMode } = useColorMode();
+    const navigate = useNavigate();
 
     const handleLogout = () => {
         const auth = getAuth();
 
         signOut(auth)
             .then(() => {
-                // La déconnexion s'est effectuée avec succès
-                // Vous pouvez effectuer des actions supplémentaires si nécessaire
+                navigate('/login');
             })
             .catch((error) => {
-                // Une erreur s'est produite lors de la déconnexion
                 const errorCode = error.code;
                 const errorMessage = error.message;
-                // Gérez l'erreur
             });
     };
 
     return (
-        <header>
-            <Navbar className="navbar-expand-sm navbar-toggleable-sm ng-white border-bottom box-shadow mb-3" container light>
-                <NavbarBrand tag={Link} to="/">AppartAppCs</NavbarBrand>
-                <NavbarToggler className="mr-2" />
-                <Collapse className="d-sm-inline-flex flex-sm-row-reverse" isOpen navbar>
-                    <Stack direction="row" spacing={4} align="center">
-                        <Button onClick={toggleColorMode}>
-                            {colorMode === 'light' ? <MoonIcon /> : <SunIcon />}
-                        </Button>
-                        <Menu>
-                            <MenuButton as={Button}>Menu</MenuButton>
-                            <MenuList>
-                                <MenuItem>
-                                    <NavLink tag={Link} to="/">
-                                        Home
-                                    </NavLink>
-                                </MenuItem>
-                                <MenuItem>
-                                    <NavLink tag={Link} to="/counter">
-                                        Counter
-                                    </NavLink>
-                                </MenuItem>
-                                <MenuItem>
-                                    <NavLink tag={Link} to="/appart">
-                                        Appart_Form
-                                    </NavLink>
-                                </MenuItem>
-                                <MenuItem>
-                                    <NavLink tag={Link} to="/delete">
-                                        DeleteAppart
-                                    </NavLink>
-                                </MenuItem>
-                                <MenuItem>
-                                    <button onClick={handleLogout}>Déconnexion</button>
-                                </MenuItem>
-                            </MenuList>
-                        </Menu>
-                    </Stack>
-                </Collapse>
-            </Navbar>
-        </header>
+        <Box bg="linear-gradient(to bottom, rgba(255, 223, 0, 1), rgba(255, 193, 7, 0.9), rgba(255, 160, 0, 1))" p={4} color='#daa520'>
+            <Flex>
+                <Text as={Link} to="/" fontSize="xl" fontWeight="bold" color='black'>Brain Conciergerie</Text>
+                <Spacer />
+                <Menu>
+                    <MenuButton as={Button}>Menu</MenuButton>
+                    <MenuList>
+                        <MenuItem as={Link} to="/">Home</MenuItem>
+                        <MenuItem as={Link} to="/appart">Apparts</MenuItem>
+                        <MenuItem onClick={handleLogout}>Deconnexion</MenuItem>
+                    </MenuList>
+                </Menu>
+            </Flex>
+        </Box>
     );
 };
 

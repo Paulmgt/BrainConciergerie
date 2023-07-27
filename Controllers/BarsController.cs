@@ -1,163 +1,139 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using BrainConciergerie.Data;
 using BrainConciergerie.Models;
 
-namespace AppartsAppReactCs.Controllers
+namespace BrainConciergerie.Controllers
 {
-    public class BarssController : Controller
+    [Route("api/[controller]")]
+    [ApiController]
+    public class BarsController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
 
-        public BarssController(ApplicationDbContext context)
+        public BarsController(ApplicationDbContext context)
         {
             _context = context;
         }
 
-        // GET: Barss
-        public async Task<IActionResult> Index()
-        {
-              return _context.Bars != null ? 
-                          View(await _context.Bars.ToListAsync()) :
-                          Problem("Entity set 'ApplicationDbContext.Bars'  is null.");
-        }
-
-        // GET: Barss/Details/5
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null || _context.Bars == null)
-            {
-                return NotFound();
-            }
-
-            var Bars = await _context.Bars
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (Bars == null)
-            {
-                return NotFound();
-            }
-
-            return View(Bars);
-        }
-
-        // GET: Barss/Create
-        public IActionResult Create()
-        {
-            return View();
-        }
-
-        // POST: Barss/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Nom,Localisation,Description,AppartsId")] Bars Bars)
-        {
-            if (ModelState.IsValid)
-            {
-                _context.Add(Bars);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            return View(Bars);
-        }
-
-        // GET: Barss/Edit/5
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null || _context.Bars == null)
-            {
-                return NotFound();
-            }
-
-            var Bars = await _context.Bars.FindAsync(id);
-            if (Bars == null)
-            {
-                return NotFound();
-            }
-            return View(Bars);
-        }
-
-        // POST: Barss/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Nom,Localisation,Description,AppartsId")] Bars Bars)
-        {
-            if (id != Bars.Id)
-            {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(Bars);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!BarsExists(Bars.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            return View(Bars);
-        }
-
-        // GET: Barss/Delete/5
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null || _context.Bars == null)
-            {
-                return NotFound();
-            }
-
-            var Bars = await _context.Bars
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (Bars == null)
-            {
-                return NotFound();
-            }
-
-            return View(Bars);
-        }
-
-        // POST: Barss/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        // GET: api/Bars
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<BarsDTO>>> GetBars()
         {
             if (_context.Bars == null)
             {
-                return Problem("Entity set 'ApplicationDbContext.Bars'  is null.");
+                return NotFound();
             }
-            var Bars = await _context.Bars.FindAsync(id);
-            if (Bars != null)
+
+            var bars = await _context.Bars.ToListAsync();
+
+            var barsDTOs = bars.Select(b => new BarsDTO
             {
-                _context.Bars.Remove(Bars);
+                Id = b.Id,
+                Nom = b.Nom,
+                Localisation = b.Localisation,
+                Description = b.Description,
+                AppartementId = b.AppartId,
+            }).ToList();
+
+            return barsDTOs;
+        }
+
+        [HttpGet("{id}")]
+        public async Task<ActionResult<BarsDTO>> GetBars(int id)
+        {
+            if (_context.Bars == null)
+            {
+                return NotFound();
             }
-            
+
+            var bars = await _context.Bars.FindAsync(id);
+
+            if (bars == null)
+            {
+                return NotFound();
+            }
+
+            var barsDTO = new BarsDTO
+            {
+                Id = bars.Id,
+                Nom = bars.Nom,
+                Localisation = bars.Localisation,
+                Description = bars.Description,
+                AppartementId = bars.AppartId,
+            };
+
+            return barsDTO;
+        }
+
+
+        // POST: api/Bars
+        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [HttpPost]
+        public async Task<ActionResult<Bars>> PostBars(Bars bars)
+        {
+          if (_context.Bars == null)
+          {
+              return Problem("Entity set 'ApplicationDbContext.Bars'  is null.");
+          }
+            _context.Bars.Add(bars);
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+
+            return CreatedAtAction("GetBars", new { id = bars.Id }, bars);
+        }
+
+        // DELETE: api/Bars/5
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteBars(int id)
+        {
+            if (_context.Bars == null)
+            {
+                return NotFound();
+            }
+            var bars = await _context.Bars.FindAsync(id);
+            if (bars == null)
+            {
+                return NotFound();
+            }
+
+            _context.Bars.Remove(bars);
+            await _context.SaveChangesAsync();
+
+            return NoContent();
         }
 
         private bool BarsExists(int id)
         {
-          return (_context.Bars?.Any(e => e.Id == id)).GetValueOrDefault();
+            return (_context.Bars?.Any(e => e.Id == id)).GetValueOrDefault();
         }
+
+        [HttpGet("{appartementId}/bars")]
+        public async Task<ActionResult<IEnumerable<BarsDTO>>> GetBarsByAppartementId(int appartementId)
+        {
+            var bars = await _context.Bars
+                .Where(b => b.Appart.Id == appartementId)
+                .Select(b => new BarsDTO
+                {
+                    Id = b.Id,
+                    Nom = b.Nom,
+                    Localisation = b.Localisation,
+                    Description = b.Description,
+                    AppartementId = b.Appart.Id
+                })
+                .ToListAsync();
+
+            if (!bars.Any())
+            {
+                return NotFound();
+            }
+
+            return bars;
+        }
+
     }
 }

@@ -1,42 +1,53 @@
-import { Counter } from "./components/Counter";
 import Home from "./components/Home";
-import DetailsAppart from "./components/Apparts/DetailsAppart";
+import DetailsAppart from "./components/DetailsVues/DetailsAppart";
 import PrivateRoute from "./Config/PrivateRoute";
-import Apparts from "./components/Apparts/Apparts";
-import LoginForm from "./components/LoginForm";
-import EditAppart from "./components/Apparts/EditAppart"
-import Register from "./components/Register";
+import AppartForm from "./components/Apparts/AppartForm";
+import AuthForm from "./components/Auth/LoginForm";
+import EquipmentVue from './components/DetailsVues/EquipementVue'
+import AutresActivites from './components/DetailsVues/AutreActiviteVue'
+import Bars from './components/DetailsVues/BarVue'
+import Cinema from './components/DetailsVues/CinemaVue'
+import NotationForm from "./components/DetailsVues/RatingVue";
 
 
 export const AppRoutes = [
     {
-        path: '/login',
-        element: <LoginForm />
-    },
-    {
-        path: '/register',
-        element: <Register />
+        path: '/authform',
+        element: <AuthForm />
     },
     {
         path: '/',
-        element: <PrivateRoute element={<Home />} />
-    },
-    {
-        path: '/counter',
-        element: <PrivateRoute element={<Counter />} />
+        element: <Home />
     },
     {
         path: '/appart',
-        element: <PrivateRoute element={<Apparts />} />
+        element: <PrivateRoute element={<AppartForm />} />
     },
     {
         path: '/details/:id',
-        element: <PrivateRoute element={<DetailsAppart />} />
+        element: <DetailsAppart />
     },
     {
-        path: '/edit_appart/:id',
-        element: <PrivateRoute element={<EditAppart />} />
-    },
+        path: '/equipment/:id',
+        element: <EquipmentVue />
+    }, 
+    {
+        path: '/shopping/:id',
+        element: <AutresActivites />
+    }, 
+    {
+        path: '/cinema/:id',
+        element: <Cinema />
+    }, 
+    {
+        path: '/bar/:id',
+        element: <Bars />
+    }, 
+    {
+        path: '/rating/:id',
+        element: <NotationForm />
+    }, 
+
    
 ];
 

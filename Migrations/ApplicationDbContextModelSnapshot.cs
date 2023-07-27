@@ -50,7 +50,7 @@ namespace BrainConciergerie.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Appartements");
+                    b.ToTable("Apparts");
                 });
 
             modelBuilder.Entity("BrainConciergerie.Models.AutresActivites", b =>
@@ -61,10 +61,7 @@ namespace BrainConciergerie.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("AppartementId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("AppartsId")
+                    b.Property<int?>("AppartId")
                         .HasColumnType("int");
 
                     b.Property<string>("Description")
@@ -78,7 +75,7 @@ namespace BrainConciergerie.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AppartementId");
+                    b.HasIndex("AppartId");
 
                     b.ToTable("AutresActivites");
                 });
@@ -91,10 +88,7 @@ namespace BrainConciergerie.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("AppartementId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("AppartsId")
+                    b.Property<int?>("AppartId")
                         .HasColumnType("int");
 
                     b.Property<string>("Description")
@@ -108,12 +102,12 @@ namespace BrainConciergerie.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AppartementId");
+                    b.HasIndex("AppartId");
 
                     b.ToTable("Bars");
                 });
 
-            modelBuilder.Entity("BrainConciergerie.Models.Cinema", b =>
+            modelBuilder.Entity("BrainConciergerie.Models.Cinemas", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -121,10 +115,7 @@ namespace BrainConciergerie.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("AppartementId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("AppartsId")
+                    b.Property<int>("AppartId")
                         .HasColumnType("int");
 
                     b.Property<string>("Description")
@@ -138,9 +129,9 @@ namespace BrainConciergerie.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AppartementId");
+                    b.HasIndex("AppartId");
 
-                    b.ToTable("Cinema");
+                    b.ToTable("Cinemas");
                 });
 
             modelBuilder.Entity("BrainConciergerie.Models.Equipements", b =>
@@ -151,10 +142,7 @@ namespace BrainConciergerie.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("AppartementId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("AppartsId")
+                    b.Property<int?>("AppartId")
                         .HasColumnType("int");
 
                     b.Property<string>("Description")
@@ -168,7 +156,7 @@ namespace BrainConciergerie.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AppartementId");
+                    b.HasIndex("AppartId");
 
                     b.ToTable("Equipements");
                 });
@@ -181,10 +169,7 @@ namespace BrainConciergerie.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("AppartementId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("AppartsId")
+                    b.Property<int?>("AppartId")
                         .HasColumnType("int");
 
                     b.Property<string>("Description")
@@ -198,12 +183,12 @@ namespace BrainConciergerie.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AppartementId");
+                    b.HasIndex("AppartId");
 
                     b.ToTable("Monuments");
                 });
 
-            modelBuilder.Entity("BrainConciergerie.Models.Photos", b =>
+            modelBuilder.Entity("BrainConciergerie.Models.NotationAppartDTO", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -214,7 +199,50 @@ namespace BrainConciergerie.Migrations
                     b.Property<int?>("AppartementId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("AppartsId")
+                    b.Property<string>("Commentaire")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NomClient")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("NotationAppartDTO");
+                });
+
+            modelBuilder.Entity("BrainConciergerie.Models.NotationsAppart", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("AppartId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Commentaire")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NomClient")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AppartId");
+
+                    b.ToTable("NotationsAppart");
+                });
+
+            modelBuilder.Entity("BrainConciergerie.Models.Photos", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("AppartId")
                         .HasColumnType("int");
 
                     b.Property<string>("Nom")
@@ -225,7 +253,7 @@ namespace BrainConciergerie.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AppartementId");
+                    b.HasIndex("AppartId");
 
                     b.ToTable("Photos");
                 });
@@ -238,10 +266,7 @@ namespace BrainConciergerie.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("AppartementId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("AppartsId")
+                    b.Property<int?>("AppartId")
                         .HasColumnType("int");
 
                     b.Property<string>("Description")
@@ -255,85 +280,98 @@ namespace BrainConciergerie.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AppartementId");
+                    b.HasIndex("AppartId");
 
                     b.ToTable("Restaurants");
                 });
 
             modelBuilder.Entity("BrainConciergerie.Models.AutresActivites", b =>
                 {
-                    b.HasOne("BrainConciergerie.Models.Appart", "Appartement")
+                    b.HasOne("BrainConciergerie.Models.Appart", "Appart")
                         .WithMany("AutresActivites")
-                        .HasForeignKey("AppartementId");
+                        .HasForeignKey("AppartId");
 
-                    b.Navigation("Appartement");
+                    b.Navigation("Appart");
                 });
 
             modelBuilder.Entity("BrainConciergerie.Models.Bars", b =>
                 {
-                    b.HasOne("BrainConciergerie.Models.Appart", "Appartement")
-                        .WithMany("Bar")
-                        .HasForeignKey("AppartementId");
+                    b.HasOne("BrainConciergerie.Models.Appart", "Appart")
+                        .WithMany("Bars")
+                        .HasForeignKey("AppartId");
 
-                    b.Navigation("Appartement");
+                    b.Navigation("Appart");
                 });
 
-            modelBuilder.Entity("BrainConciergerie.Models.Cinema", b =>
+            modelBuilder.Entity("BrainConciergerie.Models.Cinemas", b =>
                 {
-                    b.HasOne("BrainConciergerie.Models.Appart", "Appartement")
-                        .WithMany("Cinema")
-                        .HasForeignKey("AppartementId");
+                    b.HasOne("BrainConciergerie.Models.Appart", "Appart")
+                        .WithMany("Cinemas")
+                        .HasForeignKey("AppartId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.Navigation("Appartement");
+                    b.Navigation("Appart");
                 });
 
             modelBuilder.Entity("BrainConciergerie.Models.Equipements", b =>
                 {
-                    b.HasOne("BrainConciergerie.Models.Appart", "Appartement")
+                    b.HasOne("BrainConciergerie.Models.Appart", "Appart")
                         .WithMany("Equipements")
-                        .HasForeignKey("AppartementId");
+                        .HasForeignKey("AppartId");
 
-                    b.Navigation("Appartement");
+                    b.Navigation("Appart");
                 });
 
             modelBuilder.Entity("BrainConciergerie.Models.Monuments", b =>
                 {
-                    b.HasOne("BrainConciergerie.Models.Appart", "Appartement")
+                    b.HasOne("BrainConciergerie.Models.Appart", "Appart")
                         .WithMany("Monuments")
-                        .HasForeignKey("AppartementId");
+                        .HasForeignKey("AppartId");
 
-                    b.Navigation("Appartement");
+                    b.Navigation("Appart");
+                });
+
+            modelBuilder.Entity("BrainConciergerie.Models.NotationsAppart", b =>
+                {
+                    b.HasOne("BrainConciergerie.Models.Appart", "Appart")
+                        .WithMany("NotationsAppart")
+                        .HasForeignKey("AppartId");
+
+                    b.Navigation("Appart");
                 });
 
             modelBuilder.Entity("BrainConciergerie.Models.Photos", b =>
                 {
-                    b.HasOne("BrainConciergerie.Models.Appart", "Appartement")
+                    b.HasOne("BrainConciergerie.Models.Appart", "Appart")
                         .WithMany("Photos")
-                        .HasForeignKey("AppartementId");
+                        .HasForeignKey("AppartId");
 
-                    b.Navigation("Appartement");
+                    b.Navigation("Appart");
                 });
 
             modelBuilder.Entity("BrainConciergerie.Models.Restaurants", b =>
                 {
-                    b.HasOne("BrainConciergerie.Models.Appart", "Appartement")
+                    b.HasOne("BrainConciergerie.Models.Appart", "Appart")
                         .WithMany("Restaurants")
-                        .HasForeignKey("AppartementId");
+                        .HasForeignKey("AppartId");
 
-                    b.Navigation("Appartement");
+                    b.Navigation("Appart");
                 });
 
             modelBuilder.Entity("BrainConciergerie.Models.Appart", b =>
                 {
                     b.Navigation("AutresActivites");
 
-                    b.Navigation("Bar");
+                    b.Navigation("Bars");
 
-                    b.Navigation("Cinema");
+                    b.Navigation("Cinemas");
 
                     b.Navigation("Equipements");
 
                     b.Navigation("Monuments");
+
+                    b.Navigation("NotationsAppart");
 
                     b.Navigation("Photos");
 

@@ -1,15 +1,13 @@
-﻿using System.Diagnostics;
-using Microsoft.AspNetCore.Mvc;
+﻿using BrainConciergerie.Data;
 using BrainConciergerie.Models;
-using BrainConciergerie.Data;
+using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Swashbuckle.AspNetCore.Annotations;
-using System.Threading.Tasks;
 
 namespace AppartsAppReactCs.Controllers
 {
+
     [ApiController]
     [Route("[controller]")]
     public class HomeController : ControllerBase
@@ -32,8 +30,8 @@ namespace AppartsAppReactCs.Controllers
         [SwaggerResponse(500, "Internal server error")]
         public async Task<IActionResult> Index()
         {
-            return _context.Appartements != null ?
-                Ok(await _context.Appartements.ToListAsync()) :
+            return _context.Apparts != null ?
+                Ok(await _context.Apparts.ToListAsync()) :
                 Problem("Entity set 'AppDbContext.Appartements' is null.");
         }
 
@@ -50,8 +48,15 @@ namespace AppartsAppReactCs.Controllers
                 return NotFound();
             }
 
-            var appart = await _context.Appartements
-                .Include(a => a.Photos) // Charger les photos associées à l'appartement
+            var appart = await _context.Apparts
+                .Include(a => a.Equipements)
+                .Include(a => a.Monuments)
+                .Include(a => a.Restaurants)
+                .Include(a => a.Bars)
+                .Include(a => a.Cinemas)
+                .Include(a => a.Photos)
+                .Include(a => a.AutresActivites)
+                .Include(a => a.NotationsAppart)
                 .FirstOrDefaultAsync(m => m.Id == id);
 
             if (appart == null)
@@ -59,7 +64,12 @@ namespace AppartsAppReactCs.Controllers
                 return NotFound();
             }
 
+            // Load Photos into memory to calculate PhotoFileBase64
+            var photos = appart.Photos.ToList();
+
             return Ok(appart);
         }
+
+
     }
 }
